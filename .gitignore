@@ -1,0 +1,27 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Backup files
+*.tfstate.backup
+
+# Variable definitions
+*.tfvars
+
+# Crash logs
+crash.log
+
+# AWS credentials
+.aws/credentials
+.aws/config
+
+# Other sensitive files
+secrets.yaml
+.env
+
+# Module secrets
+modules/your_module/secrets/*
+
+# Exclude .terraform directory and any .hcl files
+.terraform/
+*.hcl

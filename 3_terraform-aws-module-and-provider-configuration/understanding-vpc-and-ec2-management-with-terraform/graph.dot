@@ -1,0 +1,25 @@
+digraph G {
+  rankdir = "RL";
+  node [shape = rect, fontname = "sans-serif"];
+  "data.local_file.public_key" [label="data.local_file.public_key"];
+  "aws_instance.my_ec2" [label="aws_instance.my_ec2"];
+  "aws_internet_gateway.my_igw" [label="aws_internet_gateway.my_igw"];
+  "aws_key_pair.my_key_pair" [label="aws_key_pair.my_key_pair"];
+  "aws_route_table.public_route_table" [label="aws_route_table.public_route_table"];
+  "aws_route_table_association.public_subnet_association" [label="aws_route_table_association.public_subnet_association"];
+  "aws_security_group.my_sg" [label="aws_security_group.my_sg"];
+  "aws_subnet.public_subnet" [label="aws_subnet.public_subnet"];
+  "aws_vpc.my_vpc" [label="aws_vpc.my_vpc"];
+  "random_string.key_name_suffix" [label="random_string.key_name_suffix"];
+  "aws_instance.my_ec2" -> "aws_key_pair.my_key_pair";
+  "aws_instance.my_ec2" -> "aws_security_group.my_sg";
+  "aws_instance.my_ec2" -> "aws_subnet.public_subnet";
+  "aws_internet_gateway.my_igw" -> "aws_vpc.my_vpc";
+  "aws_key_pair.my_key_pair" -> "data.local_file.public_key";
+  "aws_key_pair.my_key_pair" -> "random_string.key_name_suffix";
+  "aws_route_table.public_route_table" -> "aws_internet_gateway.my_igw";
+  "aws_route_table_association.public_subnet_association" -> "aws_route_table.public_route_table";
+  "aws_route_table_association.public_subnet_association" -> "aws_subnet.public_subnet";
+  "aws_security_group.my_sg" -> "aws_vpc.my_vpc";
+  "aws_subnet.public_subnet" -> "aws_vpc.my_vpc";
+}
