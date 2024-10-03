@@ -63,16 +63,6 @@ resource "aws_s3_object" "error" {
 }
 
 ##################################################
-# Route53 설정
-# Route 53 Private Hosted Zone 생성 (Private Zone 제거)
-resource "aws_route53_zone" "private_zone" {
-  name = var.domain_name # 원하는 도메인 이름 (예: example.com)
-  vpc {
-    vpc_id = var.vpc_id # dns를 적용할 vpc를 선택
-  }
-}
-
-##################################################
 # CloudFront 설정 
 # CloudFront의 S3 접근을 위한 Origin Access Control 설정
 resource "aws_cloudfront_origin_access_control" "oac" {
@@ -127,23 +117,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   tags = {
     Name = "${var.bucket_name}-cloudfront" # 태그로 CloudFront 배포 이름 설정
-  }
-}
-
-# CloudFront 도메인 이름을 가리키는 A 레코드 생성
-resource "aws_route53_record" "alias_record" {
-  zone_id = aws_route53_zone.public_zone.zone_id # Route 53 Zone ID
-  name    = var.domain_name                      # 도메인 이름
-  type    = "A"                                  # A 레코드 타입 지정
-
-  alias {
-    name                   = aws_cloudfront_distribution.s3_distribution.domain_name    # CloudFront 도메인 이름 지정
-    zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id # CloudFront의 호스팅 Zone ID
-    evaluate_target_health = false                                                      # 타겟의 상태를 평가하지 않음
-  }
-
-  weighted_routing_policy {
-    weight = 100 # 100%의 트래픽을 이 배포로 라우팅 (레코드를 여러개 구성해서 가중치 분산 가능)
   }
 }
 

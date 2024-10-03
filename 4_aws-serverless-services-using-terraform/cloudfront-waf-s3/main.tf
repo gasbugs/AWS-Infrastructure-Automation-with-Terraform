@@ -128,6 +128,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   tags = {
     Name = "${var.bucket_name}-cloudfront" # 태그로 CloudFront 배포 이름 설정
   }
+
+  web_acl_id = aws_wafv2_web_acl.web_acl.arn # WAF 웹 ACL 연결
 }
 
 # CloudFront 도메인 이름을 가리키는 A 레코드 생성
@@ -144,6 +146,53 @@ resource "aws_route53_record" "alias_record" {
 
   weighted_routing_policy {
     weight = 100 # 100%의 트래픽을 이 배포로 라우팅 (레코드를 여러개 구성해서 가중치 분산 가능)
+  }
+}
+
+# WAF Web ACL 생성
+resource "aws_wafv2_web_acl" "web_acl" {
+  name        = "${var.bucket_name}-web-acl"                       # WAF Web ACL 이름 설정
+  description = "WAF for CloudFront to protect ${var.domain_name}" # WAF 설명 추가
+  scope       = "CLOUDFRONT"                                       # CloudFront용 WAF이므로 스코프를 지정
+
+  default_action {
+    allow {} # 기본적으로 모든 요청 허용
+  }
+
+  # 규칙 정의 (여기서는 Managed Rule Group 예시 사용)
+  rule {
+    name     = "AWS-CommonRules" # 규칙 이름 지정
+    priority = 1                 # 규칙 우선순위
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet" # AWS에서 제공하는 관리형 규칙 그룹 사용
+        vendor_name = "AWS"                          # 규칙 그룹의 제공자
+      }
+    }
+
+    # AWS WAF의 규칙에 정의된 동작을 무시하고 지정된 동작을 수행하도록 하는 역할
+    override_action {
+      none {} # 규칙의 동작을 무시하지 않고, 원래 규칙에 지정된 동작을 수행
+      # count {} 규칙이 지정된 동작을 수행하는 대신, 해당 요청을 단순히 카운트
+    }
+
+    # visibility_config을 통해 WAF가 어떻게 로그를 수집하고 메트릭을 기록할지 지정
+    visibility_config {
+      sampled_requests_enabled   = true                            # 샘플 요청 활성화
+      cloudwatch_metrics_enabled = true                            # CloudWatch 메트릭 활성화
+      metric_name                = "${var.bucket_name}-waf-metric" # CloudWatch 메트릭 이름
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true                                # CloudWatch 메트릭 활성화
+    metric_name                = "${var.bucket_name}-web-acl-metric" # Web ACL 메트릭 이름
+    sampled_requests_enabled   = true                                # 샘플 요청 활성화
+  }
+
+  tags = {
+    Name = "${var.bucket_name}-waf" # WAF Web ACL의 태그 이름 설정
   }
 }
 

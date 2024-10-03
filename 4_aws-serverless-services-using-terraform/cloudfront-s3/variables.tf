@@ -37,12 +37,14 @@ variable "error_document" {
 variable "index_document_path" {
   description = "로컬 인덱스 문서 파일의 경로." # 변수에 대한 설명
   type        = string              # 변수 타입
+  default     = "./index.html"
 }
 
 # 로컬에서 업로드할 에러 문서 파일의 경로를 지정하는 변수
 variable "error_document_path" {
   description = "로컬 에러 문서 파일의 경로." # 변수에 대한 설명
   type        = string             # 변수 타입
+  default     = "./error.html"
 }
 
 # S3 버킷에 적용할 환경 태그를 지정하는 변수 (예: dev, prod)
@@ -50,17 +52,4 @@ variable "environment" {
   description = "버킷의 환경 태그 (예: dev, prod)." # 변수에 대한 설명
   type        = string                      # 변수 타입
   default     = "dev"                       # 기본값
-}
-
-# route53에 적용한 도메인 이름 
-variable "domain_name" {
-  description = "도메인 이름 (예: example.com)"
-  type        = string
-  default     = "1234.internal.example.com"
-}
-
-# Private DNS를 적용할 VPC
-variable "vpc_id" {
-  description = " Private DNS를 적용할 VPC"
-  type        = string
 }
