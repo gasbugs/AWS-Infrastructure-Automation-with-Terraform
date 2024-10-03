@@ -1,19 +1,4 @@
-# Terraform 및 AWS 프로바이더 버전 설정
-terraform {
-  required_version = ">= 1.0.0" # Terraform 최소 요구 버전
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws" # AWS 프로바이더의 소스 지정
-      version = "~> 4.0"        # 4.x 버전의 AWS 프로바이더 사용
-    }
-  }
-}
-
-# AWS 프로바이더 설정
-provider "aws" {
-  region  = var.aws_region  # 리소스를 배포할 AWS 리전
-  profile = var.aws_profile # 인증에 사용할 AWS CLI 프로파일
-}
+# main.tf 
 
 #############################################################
 # S3 설정
@@ -105,8 +90,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       }
     }
 
-    viewer_protocol_policy = "allow-all" # HTTPS를 강제하지 않고 HTTP도 허용
-    # viewer_protocol_policy =  "redirect-to-https" # HTTP 요청을 HTTPS로 리디렉션
+    # viewer_protocol_policy = "allow-all" # HTTPS를 강제하지 않고 HTTP도 허용
+    viewer_protocol_policy = "redirect-to-https" # HTTP 요청을 HTTPS로 리디렉션
   }
 
   restrictions {

@@ -1,0 +1,12 @@
+aws_region               = "us-east-1"
+aws_profile              = "my-sso"
+private_dns_name         = "test.private.example.com"
+test_record_ip_1         = "10.0.0.11"             # 테스트용 IP 주소
+test_record_ip_2         = "10.0.0.12"             # 테스트용 IP 주소
+ami_id                   = "ami-0ebfd941bbafe70c6" # Amazon Linux 2023 AMI (리전을 확인하여 변경 필요)
+instance_type            = "t2.micro"
+pub_key_file_path        = "c:/users/isc03/.ssh/my-key.pub"
+vpc_name                 = "private-dns-test-vpc"
+vpc_cidr_block           = "10.0.0.0/16"
+public_subnet_cidr       = "10.0.0.0/24"
+subnet_availability_zone = "us-east-1a"

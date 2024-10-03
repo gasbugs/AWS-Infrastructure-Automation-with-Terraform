@@ -1,22 +1,5 @@
 # main.tf
 
-# Terraform 및 AWS 프로바이더 버전 설정
-terraform {
-  required_version = ">= 1.9.6" # Terraform 최소 요구 버전
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws" # AWS 프로바이더의 소스 지정
-      version = "~> 4.67"       # 4.x 버전의 AWS 프로바이더 사용
-    }
-  }
-}
-
-# AWS 프로바이더 설정
-provider "aws" {
-  region  = var.aws_region  # 리소스를 배포할 AWS 리전
-  profile = var.aws_profile # 인증에 사용할 AWS CLI 프로파일
-}
-
 # 랜덤한 숫자 생성 (IAM Role과 S3 이름에 사용)
 resource "random_integer" "random_suffix" {
   min = 1000 # 최소 값

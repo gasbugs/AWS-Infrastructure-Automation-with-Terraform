@@ -1,4 +1,6 @@
-# S3 모듈 호출
+# main.tf
+
+# 모듈 호출
 module "s3" {
   source = "./modules/s3"
 
