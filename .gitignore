@@ -24,4 +24,7 @@ modules/your_module/secrets/*
 
 # Exclude .terraform directory and any .hcl files
 .terraform/
-*.hcl
+
+# Exclude .pem and any .csr files
+*.pem
+*.csr
