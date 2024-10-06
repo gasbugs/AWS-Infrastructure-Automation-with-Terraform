@@ -121,32 +121,55 @@ resource "aws_lb_target_group" "example" {
   protocol = "HTTP"
   vpc_id   = aws_vpc.example.id
   health_check {
-    path     = "/index.html"
+    path     = "/"
     protocol = "HTTP"
   }
 }
 
 # 오토 스케일링 그룹 생성 및 타겟 그룹 연결
 resource "aws_autoscaling_group" "example" {
+  # ASG에서 인스턴스가 생성될 때 사용할 Launch Template 설정
   launch_template {
     id      = aws_launch_template.example.id
-    version = "2"
+    version = "$Latest" # 가장 최신 버전의 Launch Template을 사용
   }
 
-  health_check_type         = "EC2"
-  health_check_grace_period = 300
+  # 헬스 체크 타입과 그레이스 기간 설정
+  health_check_type         = "EC2" # EC2 상태 확인을 헬스 체크 기준으로 설정
+  health_check_grace_period = 180   # 헬스 체크가 시작되기 전에 기다릴 기간 (초)
 
+  # VPC 내에서 ASG가 사용할 서브넷 설정 (다중 가용 영역에 분산 배치)
   vpc_zone_identifier = [aws_subnet.example1.id, aws_subnet.example2.id]
-  desired_capacity    = 2
-  max_size            = 3
-  min_size            = 1
+  desired_capacity    = var.desired_capacity # 원하는 인스턴스 개수 (실행 중인 인스턴스 수)
+  max_size            = var.max_size         # ASG가 스케일링될 때 최대 인스턴스 수
+  min_size            = var.min_size         # ASG의 최소 인스턴스 수
 
+  # 인스턴스 태그 설정
   tag {
     key                 = "Name"
-    value               = "ASG-Instance"
-    propagate_at_launch = true
+    value               = var.asg_tag # 인스턴스에 적용될 태그 값
+    propagate_at_launch = true        # 인스턴스 생성 시 태그를 자동으로 적용
+  }
+
+  # ASG 업데이트를 위한 instance_refresh 설정
+  instance_refresh {
+    strategy = "Rolling" # 롤링 업데이트 전략 사용 (순차적 교체)
+
+    preferences {
+      instance_warmup        = 180 # 인스턴스가 시작된 후 안정화되는 데 필요한 대기 시간 (초)
+      min_healthy_percentage = 50  # 교체 과정 중 최소 50%의 인스턴스가 정상 상태를 유지
+    }
+
+    # instance_refresh를 트리거하는 조건
+    triggers = ["tag"] # 태그 변경 시 인스턴스 교체 프로세스 시작
+  }
+
+  # Terraform이 관리하지 않는 특정 속성을 무시하도록 설정
+  lifecycle {
+    ignore_changes = [load_balancers, target_group_arns] # 로드 밸런서와 타겟 그룹 변경 무시
   }
 }
+
 
 # 오토 스케일링 그룹 인스턴스를 타겟 그룹에 연결
 resource "aws_autoscaling_attachment" "example" {

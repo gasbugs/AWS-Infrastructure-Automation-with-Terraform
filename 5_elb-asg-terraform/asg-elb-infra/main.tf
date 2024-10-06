@@ -96,11 +96,6 @@ resource "aws_autoscaling_group" "example" {
   max_size            = 3
   min_size            = 1
 
-  tag {
-    key                 = "Name"
-    value               = "ASG-Instance"
-    propagate_at_launch = true
-  }
 }
 
 # 애플리케이션 로드 밸런서를 정의

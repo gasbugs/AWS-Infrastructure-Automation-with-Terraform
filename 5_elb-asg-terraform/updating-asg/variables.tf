@@ -14,6 +14,12 @@ variable "ami_id" {
   type        = string
 }
 
+# ASG tag를 변수로 정의
+variable "asg_tag" {
+  description = "ASG tag to use for the EC2 instances"
+  type        = string
+}
+
 # 퍼블릭 키 경로
 variable "pub_key_file_path" {
   description = "value"
